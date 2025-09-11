@@ -1,0 +1,2 @@
+# System packages required for this project
+libwebp7
