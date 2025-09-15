@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meme Generator</title>
+    <link rel="stylesheet" href="{% load static %}{% static 'frontend/css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Meme Generator</h1>
+        </header>
+
+        <main>
+            <div class="form-section">
+                <form method="post" class="meme-form">
+                    {% csrf_token %}
+
+                    {% if errors %}
+                        <div class="error-messages">
+                            {% for error in errors %}
+                                <div class="error">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label for="image_url">Image URL:</label>
+                        <input type="url" id="image_url" name="image_url" value="{{ form_data.image_url }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="top_text">Top Text:</label>
+                        <input type="text" id="top_text" name="top_text" value="{{ form_data.top_text }}" maxlength="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bottom_text">Bottom Text:</label>
+                        <input type="text" id="bottom_text" name="bottom_text" value="{{ form_data.bottom_text }}" maxlength="100">
+                    </div>
+
+                    <button type="submit" class="submit-btn">Generate Meme</button>
+                </form>
+            </div>
+
+            {% if meme_image_url %}
+                <div class="preview-section">
+                    <h2>Generated Meme</h2>
+                    <div class="meme-preview">
+                        <img src="{{ meme_image_url }}" alt="Generated meme" class="meme-image">
+                    </div>
+                </div>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html>
