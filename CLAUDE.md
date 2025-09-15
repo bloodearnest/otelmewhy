@@ -6,35 +6,82 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This repo is for a workshop on opentelemetry with python
 
-It will contain a simple toy django application that generates memes, by combining top/bottom text with images.
+It contains two separate Django applications for teaching a workshop on opentelemetry:
+- **Backend**: API service that generates memes by combining top/bottom text with images
+- **Frontend**: Web UI that provides a form to create memes via the backend API
+
+## Project Structure
+
+```
+/
+├── backend/           # Django API service (port 8000)
+│   ├── manage.py
+│   ├── pyproject.toml
+│   ├── uv.lock
+│   ├── backend/       # Django settings
+│   └── memes/         # Memes API app
+└── frontend/          # Django web UI service (port 8001)
+    ├── manage.py
+    ├── pyproject.toml
+    ├── uv.lock
+    ├── frontend/      # Django settings
+    └── ui/            # Web UI app
+```
 
 ## Getting Started
 
-Since this is an empty repository, you'll need to:
+### Backend Service
+```bash
+cd backend
+uv sync
+uv run python manage.py runserver 8000
+```
 
-1. Initialize the project with the appropriate language and framework structure
-2. Set up build tools, dependency management, and development workflows
-3. Configure testing frameworks and CI/CD as needed
+### Frontend Service
+```bash
+cd frontend
+uv sync
+BACKEND_URL=http://127.0.0.1:8000 uv run python manage.py runserver 8001
+```
+
+Then visit http://127.0.0.1:8001 for the web UI.
 
 ## Development Guidelines
 
-This is a python project, a set of toy django webs apps for teaching a workshop on opentelemetry
+This is a Python project with two separate Django sites for teaching a workshop on OpenTelemetry.
 
-It should use uv for tooling, and use python 3.13
-It should use normal django idioms, using function based views, not class based views.
-It should use gunicorn for serving, whitenoise for staticfiles, httpx for http requests, and pytest for tests.
-It should use a sqlite db, but set up in WAL mode and other settings for concurrent access.
-It should only use vanilla js, with no js tooling, and native js module loading.
-It should use pillow for the image manipulation
+**Backend Dependencies**: Django, Pillow, gunicorn, whitenoise, django-cors-headers
+**Frontend Dependencies**: Django, httpx, gunicorn, whitenoise
 
-It should *not* have any opentelemetry packages installed by default. The workshop participants will be adding that.
+Both services:
+- Use uv for tooling and Python 3.13
+- Use normal Django idioms with function-based views (not class-based views)
+- Use gunicorn for serving, whitenoise for static files, pytest for tests
+- Backend uses SQLite in WAL mode for concurrent access
+- Use vanilla JS with no JS tooling, native JS module loading
+- Should *not* have any OpenTelemetry packages by default (workshop participants add them)
 
 Python style:
- - use ruff defaults for formatting
- - never use relative imports, always fully qualify
- - never use unittest.mock.
- - prefer full functional tests where possible
-
+- Use ruff defaults for formatting
+- Never use relative imports, always fully qualify
+- Never use unittest.mock
+- Prefer full functional tests where possible
 
 ## Common Commands
+
+### Backend
+```bash
+cd backend
+uv run python manage.py test           # Run tests
+uv run python manage.py migrate       # Apply migrations
+uv run ruff format .                   # Format code
+```
+
+### Frontend
+```bash
+cd frontend
+uv run python manage.py test           # Run tests
+uv run python manage.py collectstatic  # Collect static files
+uv run ruff format .                   # Format code
+```
 

@@ -1,0 +1,43 @@
+# Frontend Django project justfile
+
+# Default recipe
+default:
+    @just --list
+
+# Run the frontend Django development server
+run:
+    uv run python manage.py runserver 8000
+
+# Run tests
+test:
+    uv run python manage.py test
+
+# Run Django checks
+check:
+    uv run python manage.py check
+
+# Format code with ruff
+format:
+    uv run ruff format .
+
+# Lint code with ruff
+lint:
+    uv run ruff check .
+
+# Install/update dependencies
+sync:
+    uv sync
+
+# Open Django shell
+shell:
+    uv run python manage.py shell
+
+# Collect static files
+collectstatic:
+    uv run python manage.py collectstatic --noinput
+
+# Show available backend URLs for testing
+backend-urls:
+    @echo "Backend should be running at: http://127.0.0.1:8001"
+    @echo "Backend API endpoint: http://127.0.0.1:8001/api/create/"
+    @echo "Backend health check: http://127.0.0.1:8001/"

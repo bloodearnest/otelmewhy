@@ -1,0 +1,49 @@
+# Backend Django project justfile
+
+# Default recipe
+default:
+    @just --list
+
+# Run the backend Django development server
+run:
+    uv run python manage.py runserver 8001
+
+# Run tests
+test:
+    uv run python manage.py test
+
+# Run Django checks
+check:
+    uv run python manage.py check
+
+# Apply database migrations
+migrate:
+    uv run python manage.py migrate
+
+# Create new migrations
+makemigrations:
+    uv run python manage.py makemigrations
+
+# Format code with ruff
+format:
+    uv run ruff format .
+
+# Lint code with ruff
+lint:
+    uv run ruff check .
+
+# Install/update dependencies
+sync:
+    uv sync
+
+# Open Django shell
+shell:
+    uv run python manage.py shell
+
+# Collect static files
+collectstatic:
+    uv run python manage.py collectstatic --noinput
+
+# Create superuser
+createsuperuser:
+    uv run python manage.py createsuperuser

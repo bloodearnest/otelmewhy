@@ -2,8 +2,8 @@ import json
 import httpx
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
-from django.urls import reverse
-from urllib.parse import urlparse
+from django.conf import settings
+from urllib.parse import urlparse, urljoin
 
 
 def is_valid_url(url: str) -> bool:
@@ -62,8 +62,8 @@ def meme_generator(request: HttpRequest) -> HttpResponse:
                     "bottom_text": bottom_text,
                 }
 
-                # Make request to memes API
-                api_url = request.build_absolute_uri(reverse("memes:create_meme"))
+                # Make request to backend memes API
+                api_url = urljoin(settings.BACKEND_URL, "/api/create/")
 
                 with httpx.Client() as client:
                     response = client.post(
@@ -81,9 +81,14 @@ def meme_generator(request: HttpRequest) -> HttpResponse:
                     # API returned an error
                     try:
                         error_data = response.json()
-                        error_message = error_data.get("error", f"API request failed with status {response.status_code}")
+                        error_message = error_data.get(
+                            "error",
+                            f"API request failed with status {response.status_code}",
+                        )
                     except json.JSONDecodeError:
-                        error_message = f"API request failed with status {response.status_code}"
+                        error_message = (
+                            f"API request failed with status {response.status_code}"
+                        )
                     errors.append(f"Failed to generate meme: {error_message}")
 
             except httpx.RequestError as e:
