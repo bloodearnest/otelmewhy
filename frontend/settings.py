@@ -9,9 +9,9 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
-SECRET_KEY = "django-insecure-frontend-workshop-key-change-in-production"
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-frontend-workshop-key-change-in-production")
 
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "true").lower() == "true"
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
 
@@ -82,7 +82,7 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Backend API configuration
-BACKEND_URL = "http://127.0.0.1:8001"
+BACKEND_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:8001")
 
 # Logging configuration to see HTTP requests to backend
 LOGGING = {

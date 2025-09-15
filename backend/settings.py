@@ -9,9 +9,9 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
-SECRET_KEY = "django-insecure-backend-workshop-key-change-in-production"
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-backend-workshop-key-change-in-production")
 
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "true").lower() == "true"
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
 
@@ -21,12 +21,10 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "corsheaders",
     "memes",
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -66,6 +64,9 @@ DATABASES = {
             "init_command": """
                 PRAGMA journal_mode=WAL;
                 PRAGMA synchronous=NORMAL;
+                PRAGMA foreign_keys = ON;
+                /* How long (in ms) to let one write transaction wait for another */
+                PRAGMA busy_timeout = 5000;
                 PRAGMA cache_size=1000;
                 PRAGMA temp_store=memory;
                 PRAGMA mmap_size=128000000;
@@ -104,12 +105,3 @@ MEDIA_ROOT = BASE_DIR / "media"
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# CORS settings for frontend communication
-# Allow frontend to make requests from different port
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-]
-
-# Allow credentials in CORS requests
-CORS_ALLOW_CREDENTIALS = True
