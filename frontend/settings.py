@@ -7,11 +7,14 @@ This is the frontend web UI service for the meme generator workshop.
 import os
 from pathlib import Path
 
+
 BASE_DIR = Path(__file__).resolve().parent
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-frontend-workshop-key-change-in-production")
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY", "django-insecure-frontend-workshop-key-change-in-production"
+)
 
-DEBUG = os.environ.get("DEBUG", "true").lower() == "true"
+DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
 

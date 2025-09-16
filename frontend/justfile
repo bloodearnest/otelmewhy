@@ -1,12 +1,15 @@
 # Frontend Django project justfile
+set dotenv-load := true
 
 # Default recipe
 default:
     @just --list
 
-# Run the frontend Django development server
+# Run the frontend Django server with gunicorn (with OpenTelemetry)
 run:
-    uv run python manage.py runserver 8000
+    uv sync
+    uv run python -m gunicorn --config gunicorn.conf.py wsgi:application
+
 
 # Run tests
 test:

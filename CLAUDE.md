@@ -14,13 +14,13 @@ It contains two separate Django applications for teaching a workshop on opentele
 
 ```
 /
-├── backend/           # Django API service (port 8000)
+├── backend/           # Django API service (port 8001)
 │   ├── manage.py
 │   ├── pyproject.toml
 │   ├── uv.lock
 │   ├── backend/       # Django settings
 │   └── memes/         # Memes API app
-└── frontend/          # Django web UI service (port 8001)
+└── frontend/          # Django web UI service (port 8000)
     ├── manage.py
     ├── pyproject.toml
     ├── uv.lock
@@ -34,17 +34,17 @@ It contains two separate Django applications for teaching a workshop on opentele
 ```bash
 cd backend
 uv sync
-uv run python manage.py runserver 8000
+uv run python manage.py runserver 8001
 ```
 
 ### Frontend Service
 ```bash
 cd frontend
 uv sync
-BACKEND_URL=http://127.0.0.1:8000 uv run python manage.py runserver 8001
+BACKEND_URL=http://127.0.0.1:8001 uv run python manage.py runserver 8000
 ```
 
-Then visit http://127.0.0.1:8001 for the web UI.
+Then visit http://127.0.0.1:8000 for the web UI.
 
 ## Development Guidelines
 

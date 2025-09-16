@@ -1,21 +1,20 @@
 # Top-level justfile for meme generator project
+set dotenv-load := true
 
 # Default recipe
 default:
     @just --list
 
-# Run both backend and frontend Django servers concurrently
-run:
-    @echo "Starting both backend (port 8001) and frontend (port 8000) servers..."
-    @echo "Backend will be available at: http://127.0.0.1:8001"
-    @echo "Frontend will be available at: http://127.0.0.1:8000"
-    @echo "Press Ctrl+C to stop both servers"
-    just run-parallel
-
-# Run both servers in parallel using background processes
-run-parallel:
+# Run servers for specific projects or both (usage: just run [backend] [frontend])
+run *projects="backend frontend":
     #!/usr/bin/env bash
     set -euo pipefail
+
+    test -f .env || cp .env.defaults .env
+    echo "Starting servers for: {{ projects }}"
+    echo "Backend will be available at: http://127.0.0.1:8001"
+    echo "Frontend will be available at: http://127.0.0.1:8000"
+    echo "Press Ctrl+C to stop servers"
 
     # Function to cleanup background processes on exit
     cleanup() {
@@ -27,32 +26,17 @@ run-parallel:
     }
     trap cleanup EXIT INT TERM
 
-    # Start backend in background
-    echo "Starting backend server..."
-    cd backend && uv run python manage.py runserver 8001 &
-    BACKEND_PID=$!
+    # Start each project in background
+    for project in {{ projects }}; do
+        echo "Starting $project server..."
+        just $project/run &
+        sleep 1
+    done
 
-    # Wait a moment for backend to start
-    sleep 2
-
-    # Start frontend in background
-    echo "Starting frontend server..."
-    cd frontend && uv run python manage.py runserver 8000 &
-    FRONTEND_PID=$!
-
-    # Wait for both processes
-    echo "Both servers running. Press Ctrl+C to stop."
+    # Wait for all processes
+    echo "All servers running. Press Ctrl+C to stop."
     wait
 
-# Run only the backend server
-run-backend:
-    @echo "Starting backend server on port 8001..."
-    just backend/run
-
-# Run only the frontend server
-run-frontend:
-    @echo "Starting frontend server on port 8000..."
-    just frontend/run
 
 # Run tests for specific projects or both (usage: just test [backend] [frontend])
 test *projects="backend frontend":

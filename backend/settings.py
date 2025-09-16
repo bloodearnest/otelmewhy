@@ -9,9 +9,9 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-backend-workshop-key-change-in-production")
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-backend-workshop-key-change-in-production")
 
-DEBUG = os.environ.get("DEBUG", "true").lower() == "true"
+DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() == "true"
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
 
