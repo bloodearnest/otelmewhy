@@ -9,7 +9,9 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-backend-workshop-key-change-in-production")
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY", "django-insecure-backend-workshop-key-change-in-production"
+)
 
 DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() == "true"
 
@@ -105,3 +107,13 @@ MEDIA_ROOT = BASE_DIR / "media"
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+from opentelemetry.instrumentation.django import DjangoInstrumentor
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+from opentelemetry.instrumentation.sqlite3 import SQLite3Instrumentor
+
+
+# important that django instrument() is called *after* settings.MIDDLEWARE is configured
+DjangoInstrumentor().instrument()
+# these can be called anywhere, but might as well do it all in one place
+HTTPXClientInstrumentor().instrument()
+SQLite3Instrumentor().instrument()
