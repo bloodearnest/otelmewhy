@@ -12,7 +12,7 @@ run:
 
 
 # Run system integration tests
-test:
+test n="64":
     #!/usr/bin/env bash
     set -euo pipefail
 
@@ -60,7 +60,7 @@ test:
         # Cleanup will happen automatically via trap
     else
         echo "Servers already running, proceeding with tests..."
-        uv run python test_system.py
+        uv run python test_system.py -n {{ n }}
     fi
 
 # Run Django checks

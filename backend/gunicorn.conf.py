@@ -2,6 +2,7 @@
 bind = "127.0.0.1:8001"
 workers = 4
 worker_class = "sync"
+reload = True
 
 
 def post_fork(server, worker):

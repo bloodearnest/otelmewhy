@@ -77,6 +77,10 @@ def meme_generator(request: HttpRequest) -> HttpResponse:
                     # Success - get the meme image URL
                     result = response.json()
                     meme_image_url = result.get("image_url")
+
+                    # Convert relative URLs to absolute URLs using the backend URL
+                    if meme_image_url and meme_image_url.startswith("/"):
+                        meme_image_url = urljoin(settings.BACKEND_URL, meme_image_url)
                 else:
                     # API returned an error
                     try:

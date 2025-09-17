@@ -38,13 +38,9 @@ run *projects="backend frontend":
     wait
 
 
-# Run tests for specific projects or both (usage: just test [backend] [frontend])
-test *projects="backend frontend":
-    #!/usr/bin/env bash
-    for project in {{ projects }}; do
-        echo "Running $project tests..."
-        just $project/test
-    done
+# Run the functional/load tests
+test n="64":
+    just frontend/test {{ n }}
 
 # Run checks for specific projects or both (usage: just check [backend] [frontend])
 check *projects="backend frontend":

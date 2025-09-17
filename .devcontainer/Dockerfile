@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     git \
     ca-certificates \
     bash-completion \
+    just \
     && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user
@@ -17,9 +18,6 @@ RUN useradd -m -s /bin/bash vscode && \
 # Install uv (Python package manager)
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.cargo/bin:$PATH"
-
-# Install just (command runner)
-RUN curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
 
 # Set up just tab completion for bash
 RUN mkdir -p /etc/bash_completion.d && \

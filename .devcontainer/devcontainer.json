@@ -20,11 +20,26 @@
         "python.linting.ruffPath": "uv run ruff",
         "python.formatting.provider": "none",
         "ruff.path": ["uv", "run", "ruff"],
-        "terminal.integrated.shell.linux": "/bin/bash"
+        "terminal.integrated.shell.linux": "/bin/bash",
+        "python.analysis.autoImportCompletions": true,
+        "python.languageServer": "Pylance",
+        "remote.autoForwardPorts": false
       }
     }
   },
   "forwardPorts": [8000, 8001],
-  "postCreateCommand": "echo 'Welcome to the OpenTelemetry Workshop!' && just --version && uv --version && just migrate",
+  "portsAttributes": {
+    "8000": {
+      "label": "Frontend (Meme Generator)",
+      "onAutoForward": "openBrowser",
+      "visibility": "public"
+    },
+    "8001": {
+      "label": "Backend API",
+      "onAutoForward": "silent",
+      "visibility": "public"
+    }
+  },
+  "postCreateCommand": "echo 'Welcome to the OpenTelemetry Workshop!' && just --version && uv --version && just sync && just migrate",
   "remoteUser": "vscode"
 }

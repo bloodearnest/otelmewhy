@@ -1,6 +1,5 @@
 import json
 from django.http import HttpResponse, JsonResponse, Http404
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.shortcuts import get_object_or_404
 from django.conf import settings
@@ -11,11 +10,10 @@ from memes.utils import generate_meme
 
 
 def health_check(request):
-    """Basic health check view that returns 'OK'."""
-    return HttpResponse("OK")
+    """Basic health check view that returns status message."""
+    return HttpResponse("PyCon UK 2025 Workshop - Backend API")
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def create_meme(request):
     """JSON API endpoint to create a meme."""

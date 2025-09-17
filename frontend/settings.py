@@ -85,7 +85,14 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Backend API configuration
-BACKEND_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:8001")
+# Auto-detect Codespaces environment and use the correct forwarded URL
+if os.environ.get("CODESPACE_NAME"):
+    # In GitHub Codespaces, use the forwarded URL format
+    codespace_name = os.environ.get("CODESPACE_NAME")
+    BACKEND_URL = f"https://{codespace_name}-8001.app.github.dev"
+else:
+    # Local development or custom environment
+    BACKEND_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:8001")
 
 # Logging configuration to see HTTP requests to backend
 LOGGING = {
