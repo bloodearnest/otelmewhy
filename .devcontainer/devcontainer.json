@@ -1,0 +1,30 @@
+{
+  "name": "OpenTelemetry Workshop",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {},
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "charliermarsh.ruff",
+        "ms-vscode.makefile-tools"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "uv run python",
+        "python.terminal.activateEnvironment": false,
+        "python.linting.enabled": true,
+        "python.linting.ruffEnabled": true,
+        "python.linting.ruffPath": "uv run ruff",
+        "python.formatting.provider": "none",
+        "ruff.path": ["uv", "run", "ruff"],
+        "terminal.integrated.shell.linux": "/bin/bash"
+      }
+    }
+  },
+  "forwardPorts": [8000, 8001],
+  "postCreateCommand": "echo 'Welcome to the OpenTelemetry Workshop!' && just --version && uv --version && just migrate",
+  "remoteUser": "vscode"
+}
