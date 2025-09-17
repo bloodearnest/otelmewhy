@@ -1,0 +1,42 @@
+[
+    {
+        "image_url": "https://static.wikia.nocookie.net/thehungergamesrp/images/b/b1/WonkaReal.png/revision/latest/scale-to-width-down/1200?cb=20151126215811",
+        "top_text": "Oh you use Prometheus?",
+        "bottom_text": "Tell me again how pull is superior"
+    },
+    {
+        "image_url": "https://cdn-useast1.kapwing.com/static/templates/mugatu-so-hot-right-now-meme-template-full-1b30e78e.webp",
+        "top_text": "Observability?",
+        "bottom_text": "So hot right now"
+    },
+    {
+        "image_url": "https://static0.gamerantimages.com/wordpress/wp-content/uploads/2022/02/Woody--Buzz_Toy-Story.jpg?w=1600&h=900&fit=crop",
+        "top_text": "spans",
+        "bottom_text": "spans everywhere"
+    },
+    {
+        "image_url": "https://imgflip.com/s/meme/You-Get-An-X-And-You-Get-An-X.jpg",
+        "top_text": "You get a dashboard",
+        "bottom_text": "And you get a dashboard"
+    },
+    {
+        "image_url": "https://museumofcrisps.com/wp-content/uploads/2023/07/shocked-cat.jpg",
+        "top_text": "the alerts",
+        "bottom_text": "they keep coming"
+    },
+    {
+        "image_url": "https://www.joblo.com/wp-content/uploads/2022/10/Laurence-Fishburne-Matrix-656x343.jpg",
+        "top_text": "what if told you",
+        "bottom_text": "observability is based on layers not pillars"
+    },
+    {
+        "image_url": "https://makeameme.org/media/templates/paranoia_meme.jpg",
+        "top_text": "Monitoring?",
+        "bottom_text": "Observability!"
+    },
+    {
+        "image_url": "https://pypi-camo.freetls.fastly.net/abad86cae404c71b77358825d2db47dc2f726684/68747470733a2f2f7777772e6d656d652d617273656e616c2e636f6d2f6d656d65732f66623764636663343036346435623735653238316433353435393062313361352e6a7067",
+        "top_text": "one does not simply",
+        "bottom_text": "observe production"
+    }
+]

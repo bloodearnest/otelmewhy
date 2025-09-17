@@ -10,11 +10,6 @@ run:
     uv sync
     uv run python -m gunicorn --config gunicorn.conf.py wsgi:application
 
-
-# Run tests
-test:
-    uv run python manage.py test
-
 # Run Django checks
 check:
     uv run python manage.py check
