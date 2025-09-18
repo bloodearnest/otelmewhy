@@ -5,7 +5,7 @@ from opentelemetry.sdk.trace import TracerProvider, export
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 
 
-def setup_tracing():
+def setup_tracing(server, worker):
     """Set up otel provider and exporters."""
 
     # do not export backend telemetry initially for pedagological purposes
@@ -27,6 +27,8 @@ def setup_tracing():
     if traces_exporter == "console":
         console_exporter = export.ConsoleSpanExporter()
         provider.add_span_processor(export.SimpleSpanProcessor(console_exporter))
+        server.log.info(f"Set up console exporter for worker {worker.pid}")
     elif traces_exporter == "otlp":
         otlp_exporter = OTLPSpanExporter()
         provider.add_span_processor(export.BatchSpanProcessor(otlp_exporter))
+        server.log.info(f"Set up OTLP exporter for worker {worker.pid}")

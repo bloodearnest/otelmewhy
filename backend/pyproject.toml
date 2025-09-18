@@ -8,6 +8,7 @@ dependencies = [
     "gunicorn>=23.0.0",
     "pillow>=10.4.0",
     "httpx>=0.27.0",
+    "python-dotenv>=1.0.0",
     "opentelemetry-exporter-otlp-proto-http>=1.37.0",
     "opentelemetry-instrumentation-django>=0.58b0",
     "opentelemetry-instrumentation-sqlite3>=0.58b0",

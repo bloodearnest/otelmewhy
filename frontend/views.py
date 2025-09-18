@@ -142,7 +142,9 @@ def meme_generator(request: HttpRequest) -> HttpResponse:
                         "bottom_text": result.get("bottom_text", ""),
                     }
                 else:
-                    errors.append(f"Could not load meme details (HTTP {response.status_code})")
+                    errors.append(
+                        f"Could not load meme details (HTTP {response.status_code})"
+                    )
 
             except Exception as e:
                 errors.append(f"Error loading meme: {str(e)}")
@@ -161,5 +163,3 @@ def meme_generator(request: HttpRequest) -> HttpResponse:
             "random_meme_data": random_meme_data,
         },
     )
-
-

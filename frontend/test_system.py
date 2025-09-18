@@ -54,7 +54,9 @@ def extract_meme_url_from_html(html_content):
         return match.group(1)
 
     # Look for img tags with backend URLs (localhost or Codespaces)
-    backend_img_pattern = r'<img[^>]*src=["\']([^"\']*(?:127\.0\.0\.1:8001|app\.github\.dev)[^"\']*)["\']'
+    backend_img_pattern = (
+        r'<img[^>]*src=["\']([^"\']*(?:127\.0\.0\.1:8001|app\.github\.dev)[^"\']*)["\']'
+    )
     match = re.search(backend_img_pattern, html_content)
     if match:
         return match.group(1)
@@ -83,12 +85,12 @@ def extract_error_from_html(html_content):
         errors = []
         for match in matches:
             # Remove HTML tags and clean whitespace
-            clean_error = re.sub(r'<[^>]+>', '', match).strip()
+            clean_error = re.sub(r"<[^>]+>", "", match).strip()
             # HTML decode the error message
             clean_error = html.unescape(clean_error)
             if clean_error:
                 errors.append(clean_error)
-        return '; '.join(errors) if errors else "Error div found but no content"
+        return "; ".join(errors) if errors else "Error div found but no content"
     return None
 
 
@@ -121,7 +123,9 @@ async def test_meme_creation_async(semaphore, base_url, meme_data, index):
                 # Check for HTTP errors and print debug info if needed
                 if create_response.status_code != 200:
                     error_msg = extract_error_from_html(create_response.text)
-                    print(f"❌ Test {index + 1}: {meme_data['top_text'][:30]}... -> HTTP {create_response.status_code}")
+                    print(
+                        f"❌ Test {index + 1}: {meme_data['top_text'][:30]}... -> HTTP {create_response.status_code}"
+                    )
                     if error_msg:
                         print(f"   Error: {error_msg}")
                     else:
@@ -140,16 +144,22 @@ async def test_meme_creation_async(semaphore, base_url, meme_data, index):
                             meme_image_url = response_data["meme_url"]
                         else:
                             error_msg = extract_error_from_html(create_response.text)
-                            print(f"❌ Test {index + 1}: {meme_data['top_text'][:30]}... -> ERROR: {e}")
+                            print(
+                                f"❌ Test {index + 1}: {meme_data['top_text'][:30]}... -> ERROR: {e}"
+                            )
                             if error_msg:
                                 print(f"   Error: {error_msg}")
                             else:
-                                print(f"   Response status: {create_response.status_code}")
+                                print(
+                                    f"   Response status: {create_response.status_code}"
+                                )
                                 print(f"   Response text: {create_response.text}")
                             return False
                     except json.JSONDecodeError:
                         error_msg = extract_error_from_html(create_response.text)
-                        print(f"❌ Test {index + 1}: {meme_data['top_text'][:30]}... -> ERROR: {e}")
+                        print(
+                            f"❌ Test {index + 1}: {meme_data['top_text'][:30]}... -> ERROR: {e}"
+                        )
                         if error_msg:
                             print(f"   Error: {error_msg}")
                         else:
@@ -165,7 +175,9 @@ async def test_meme_creation_async(semaphore, base_url, meme_data, index):
 
         except httpx.HTTPStatusError as e:
             error_msg = extract_error_from_html(e.response.text)
-            print(f"❌ Test {index + 1}: {meme_data['top_text'][:30]}... -> HTTP {e.response.status_code}")
+            print(
+                f"❌ Test {index + 1}: {meme_data['top_text'][:30]}... -> HTTP {e.response.status_code}"
+            )
             if error_msg:
                 print(f"   Error: {error_msg}")
             else:
@@ -212,8 +224,13 @@ def main():
     """Run the system test"""
     # Parse command line arguments
     parser = argparse.ArgumentParser(description="Meme Generator System Test")
-    parser.add_argument('-n', '--num-tests', type=int, default=64,
-                      help='Number of test requests to generate (default: 64)')
+    parser.add_argument(
+        "-n",
+        "--num-tests",
+        type=int,
+        default=64,
+        help="Number of test requests to generate (default: 64)",
+    )
     args = parser.parse_args()
 
     print("=== Meme Generator System Test ===")
@@ -239,7 +256,9 @@ def main():
 
     # Run tests in parallel
     start_time = time.time()
-    passed, total = asyncio.run(run_parallel_tests(test_data, frontend_url, args.num_tests))
+    passed, total = asyncio.run(
+        run_parallel_tests(test_data, frontend_url, args.num_tests)
+    )
     end_time = time.time()
 
     # Summary
