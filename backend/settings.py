@@ -6,6 +6,10 @@ This is the backend API service for the meme generator workshop.
 
 import os
 from pathlib import Path
+from opentelemetry.instrumentation.django import DjangoInstrumentor
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+from opentelemetry.instrumentation.sqlite3 import SQLite3Instrumentor
+
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -124,10 +128,11 @@ LOGGING = {
     },
 }
 
-from opentelemetry.instrumentation.django import DjangoInstrumentor
-from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
-from opentelemetry.instrumentation.sqlite3 import SQLite3Instrumentor
+# Apply delay patch BEFORE OpenTelemetry instrumentation
+# This ensures delays appear within OpenTelemetry spans
+from client import patch_imgflip_delay
 
+patch_imgflip_delay()
 
 # important that django instrument() is called *after* settings.MIDDLEWARE is configured
 DjangoInstrumentor().instrument()

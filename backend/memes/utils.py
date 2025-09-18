@@ -1,10 +1,27 @@
 import io
 import os
+import random
 import re
+import time
+from urllib.parse import urlparse
 import httpx
 from PIL import Image, ImageDraw, ImageFont
 from django.core.files.base import ContentFile
 from django.conf import settings
+from client import httpx_client
+from opentelemetry import trace
+from functools import wraps
+
+tracer = trace.get_tracer("memes.generate")
+
+
+def span_decorator(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        with tracer.start_as_current_span(f.__name__):
+            return f(*args, **kwargs)
+
+    return wrapper
 
 
 def load_impact_font(size):
@@ -75,9 +92,10 @@ def is_emoji(char):
 
 def fetch_image(image_url):
     """Fetch image from URL and return PIL Image object."""
-    response = httpx.get(image_url, follow_redirects=True)
+    response = httpx_client.get(image_url)
     response.raise_for_status()
-    return Image.open(io.BytesIO(response.content))
+    content = io.BytesIO(response.content)
+    return Image.open(content)
 
 
 def generate_meme(image_url, top_text="", bottom_text=""):
@@ -104,6 +122,7 @@ def generate_meme(image_url, top_text="", bottom_text=""):
     width, height = base_image.size
 
     # Calculate optimal font size based on text length and image dimensions
+
     def calculate_font_size(text, image_width, image_height):
         if not text:
             return 40  # Default size for empty text
@@ -161,6 +180,7 @@ def generate_meme(image_url, top_text="", bottom_text=""):
     font = load_impact_font(font_size)
 
     # Function to draw text with outline and emoji support
+
     def draw_text_with_outline(
         draw,
         text,
@@ -251,6 +271,7 @@ def generate_meme(image_url, top_text="", bottom_text=""):
 
     # Save to BytesIO
     output = io.BytesIO()
+
     base_image.save(output, format="PNG")
     output.seek(0)
 
