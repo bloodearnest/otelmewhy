@@ -13,6 +13,15 @@
         </header>
 
         <main>
+            {% if meme_image_url %}
+                <div class="preview-section">
+                    <h2>Generated Meme</h2>
+                    <div class="meme-preview">
+                        <img src="{{ meme_image_url }}" alt="Generated meme" class="meme-image">
+                    </div>
+                </div>
+            {% endif %}
+
             <div class="form-section">
                 <form method="post" class="meme-form">
                     {% csrf_token %}
@@ -40,16 +49,25 @@
                         <input type="text" id="bottom_text" name="bottom_text" value="{{ form_data.bottom_text }}" maxlength="100">
                     </div>
 
-                    <button type="submit" class="submit-btn">Generate Meme</button>
+                    <button type="submit" class="submit-btn">
+                        {% if meme_image_url %}
+                            Regenerate Meme
+                        {% else %}
+                            Generate Meme
+                        {% endif %}
+                    </button>
                 </form>
             </div>
 
             {% if meme_image_url %}
-                <div class="preview-section">
-                    <h2>Generated Meme</h2>
-                    <div class="meme-preview">
-                        <img src="{{ meme_image_url }}" alt="Generated meme" class="meme-image">
-                    </div>
+                <div class="form-section">
+                    <form method="post" class="meme-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="image_url" value="{{ random_meme_data.image_url }}">
+                        <input type="hidden" name="top_text" value="{{ random_meme_data.top_text }}">
+                        <input type="hidden" name="bottom_text" value="{{ random_meme_data.bottom_text }}">
+                        <button type="submit" class="submit-btn">Generate Random Meme</button>
+                    </form>
                 </div>
             {% endif %}
         </main>

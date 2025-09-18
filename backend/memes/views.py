@@ -68,3 +68,19 @@ def serve_meme(request, meme_id):
             return response
     except FileNotFoundError:
         raise Http404("Image file not found")
+
+
+def get_meme(request, meme_id):
+    """Get meme details by ID."""
+    meme = get_object_or_404(Meme, id=meme_id)
+
+    return JsonResponse(
+        {
+            "id": str(meme.id),
+            "image_url": request.build_absolute_uri(meme.get_image_url()),
+            "top_text": meme.top_text,
+            "bottom_text": meme.bottom_text,
+            "original_image_url": meme.image_url,
+            "created_at": meme.created_at.isoformat(),
+        }
+    )

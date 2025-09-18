@@ -1,9 +1,11 @@
 import json
+import random
 import httpx
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpRequest, HttpResponse
 from django.conf import settings
 from urllib.parse import urlparse, urljoin
+from pathlib import Path
 
 
 def is_valid_url(url: str) -> bool:
@@ -15,15 +17,34 @@ def is_valid_url(url: str) -> bool:
         return False
 
 
+def load_test_data():
+    """Load test data from test-data.json"""
+    test_data_path = Path(__file__).parent / "test-data.json"
+    try:
+        with open(test_data_path) as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        # Fallback to hardcoded default if file not found or invalid
+        return [
+            {
+                "image_url": "https://cdn-useast1.kapwing.com/static/templates/x-x-everywhere-meme-template-full-96173e84.webp",
+                "top_text": "SPANS",
+                "bottom_text": "SPANS EVERYWHERE",
+            }
+        ]
+
+
+def get_random_default_data():
+    """Get a random meme from test data for default form values"""
+    test_data = load_test_data()
+    return random.choice(test_data)
+
+
 def meme_generator(request: HttpRequest) -> HttpResponse:
     """View for the meme generator form and preview."""
     errors = []
-    # Default test data from memes API tests
-    default_form_data = {
-        "image_url": "https://cdn-useast1.kapwing.com/static/templates/x-x-everywhere-meme-template-full-96173e84.webp",
-        "top_text": "SPANS",
-        "bottom_text": "SPANS EVERYWHERE",
-    }
+    # Get random default data from test-data.json
+    default_form_data = get_random_default_data()
     form_data = default_form_data.copy()
     meme_image_url = None
 
@@ -74,13 +95,11 @@ def meme_generator(request: HttpRequest) -> HttpResponse:
                     )
 
                 if response.status_code == 201:
-                    # Success - get the meme image URL
+                    # Success - extract meme ID and redirect to GET with query param
                     result = response.json()
-                    meme_image_url = result.get("image_url")
-
-                    # Convert relative URLs to absolute URLs using the backend URL
-                    if meme_image_url and meme_image_url.startswith("/"):
-                        meme_image_url = urljoin(settings.BACKEND_URL, meme_image_url)
+                    meme_id = result.get("id")
+                    if meme_id:
+                        return redirect(f"/?meme_id={meme_id}")
                 else:
                     # API returned an error
                     try:
@@ -102,6 +121,36 @@ def meme_generator(request: HttpRequest) -> HttpResponse:
             except Exception as e:
                 errors.append(f"Unexpected error: {str(e)}")
 
+    elif request.method == "GET":
+        # Check for meme_id query parameter
+        meme_id = request.GET.get("meme_id")
+        if meme_id:
+            try:
+                # Construct meme image URL directly using the backend URL and meme ID
+                meme_image_url = urljoin(settings.BACKEND_URL, f"/images/{meme_id}/")
+
+                # Get meme details to populate form
+                api_url = urljoin(settings.BACKEND_URL, f"/api/meme/{meme_id}/")
+                with httpx.Client() as client:
+                    response = client.get(api_url, timeout=30.0)
+
+                if response.status_code == 200:
+                    result = response.json()
+                    form_data = {
+                        "image_url": result.get("original_image_url", ""),
+                        "top_text": result.get("top_text", ""),
+                        "bottom_text": result.get("bottom_text", ""),
+                    }
+                else:
+                    errors.append(f"Could not load meme details (HTTP {response.status_code})")
+
+            except Exception as e:
+                errors.append(f"Error loading meme: {str(e)}")
+                meme_image_url = None
+
+    # Get random data for the "Generate Random Meme" form
+    random_meme_data = get_random_default_data()
+
     return render(
         request,
         "frontend/meme_generator.html",
@@ -109,5 +158,8 @@ def meme_generator(request: HttpRequest) -> HttpResponse:
             "errors": errors,
             "form_data": form_data,
             "meme_image_url": meme_image_url,
+            "random_meme_data": random_meme_data,
         },
     )
+
+
