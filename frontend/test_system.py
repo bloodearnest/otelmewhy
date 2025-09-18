@@ -26,6 +26,30 @@ from urllib.parse import urljoin
 
 import httpx
 
+# Global async HTTP client with connection pooling
+_async_client = None
+
+async def get_async_http_client():
+    """Get or create a shared async HTTP client with connection pooling."""
+    global _async_client
+    if _async_client is None:
+        _async_client = httpx.AsyncClient(
+            timeout=10.0,
+            limits=httpx.Limits(
+                max_keepalive_connections=20,
+                max_connections=50,
+                keepalive_expiry=30.0
+            )
+        )
+    return _async_client
+
+async def close_async_http_client():
+    """Close the shared async HTTP client."""
+    global _async_client
+    if _async_client is not None:
+        await _async_client.aclose()
+        _async_client = None
+
 # Disable httpx logging
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
@@ -101,61 +125,44 @@ async def test_meme_creation_async(semaphore, base_url, meme_data, index):
             # Disable httpx logging for this test
             logging.getLogger("httpx").setLevel(logging.WARNING)
 
-            # Create a new client for each test
-            async with httpx.AsyncClient(
-                timeout=10.0,
-                headers={
-                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-                },
-            ) as client:
-                # POST the meme data directly (no CSRF token needed)
-                form_data = {
-                    "image_url": meme_data["image_url"],
-                    "top_text": meme_data["top_text"],
-                    "bottom_text": meme_data["bottom_text"],
-                }
+            # Use shared client with connection pooling
+            client = await get_async_http_client()
 
-                # Follow redirects to get the success page
-                create_response = await client.post(
-                    base_url, data=form_data, follow_redirects=True
+            # POST the meme data directly (no CSRF token needed)
+            form_data = {
+                "image_url": meme_data["image_url"],
+                "top_text": meme_data["top_text"],
+                "bottom_text": meme_data["bottom_text"],
+            }
+
+            # Follow redirects to get the success page
+            create_response = await client.post(
+                base_url, data=form_data, follow_redirects=True
+            )
+
+            # Check for HTTP errors and print debug info if needed
+            if create_response.status_code != 200:
+                error_msg = extract_error_from_html(create_response.text)
+                print(
+                    f"❌ Test {index + 1}: {meme_data['top_text'][:30]}... -> HTTP {create_response.status_code}"
                 )
+                if error_msg:
+                    print(f"   Error: {error_msg}")
+                else:
+                    print(f"   Response headers: {dict(create_response.headers)}")
+                    print(f"   Response text: {create_response.text}")
+                return False
 
-                # Check for HTTP errors and print debug info if needed
-                if create_response.status_code != 200:
-                    error_msg = extract_error_from_html(create_response.text)
-                    print(
-                        f"❌ Test {index + 1}: {meme_data['top_text'][:30]}... -> HTTP {create_response.status_code}"
-                    )
-                    if error_msg:
-                        print(f"   Error: {error_msg}")
-                    else:
-                        print(f"   Response headers: {dict(create_response.headers)}")
-                        print(f"   Response text: {create_response.text}")
-                    return False
-
-                # Extract meme image URL from response (but don't fetch the image)
+            # Extract meme image URL from response (but don't fetch the image)
+            try:
+                meme_image_url = extract_meme_url_from_html(create_response.text)
+            except ValueError as e:
+                # If we can't find it in HTML, maybe it's a JSON response
                 try:
-                    meme_image_url = extract_meme_url_from_html(create_response.text)
-                except ValueError as e:
-                    # If we can't find it in HTML, maybe it's a JSON response
-                    try:
-                        response_data = create_response.json()
-                        if "meme_url" in response_data:
-                            meme_image_url = response_data["meme_url"]
-                        else:
-                            error_msg = extract_error_from_html(create_response.text)
-                            print(
-                                f"❌ Test {index + 1}: {meme_data['top_text'][:30]}... -> ERROR: {e}"
-                            )
-                            if error_msg:
-                                print(f"   Error: {error_msg}")
-                            else:
-                                print(
-                                    f"   Response status: {create_response.status_code}"
-                                )
-                                print(f"   Response text: {create_response.text}")
-                            return False
-                    except json.JSONDecodeError:
+                    response_data = create_response.json()
+                    if "meme_url" in response_data:
+                        meme_image_url = response_data["meme_url"]
+                    else:
                         error_msg = extract_error_from_html(create_response.text)
                         print(
                             f"❌ Test {index + 1}: {meme_data['top_text'][:30]}... -> ERROR: {e}"
@@ -163,15 +170,28 @@ async def test_meme_creation_async(semaphore, base_url, meme_data, index):
                         if error_msg:
                             print(f"   Error: {error_msg}")
                         else:
-                            print(f"   Response status: {create_response.status_code}")
+                            print(
+                                f"   Response status: {create_response.status_code}"
+                            )
                             print(f"   Response text: {create_response.text}")
                         return False
+                except json.JSONDecodeError:
+                    error_msg = extract_error_from_html(create_response.text)
+                    print(
+                        f"❌ Test {index + 1}: {meme_data['top_text'][:30]}... -> ERROR: {e}"
+                    )
+                    if error_msg:
+                        print(f"   Error: {error_msg}")
+                    else:
+                        print(f"   Response status: {create_response.status_code}")
+                        print(f"   Response text: {create_response.text}")
+                    return False
 
-                # Success - print one line summary (no image fetch)
-                print(
-                    f"✅ Test {index + 1}: {meme_data['top_text'][:30]}... -> {meme_image_url}"
-                )
-                return True
+            # Success - print one line summary (no image fetch)
+            print(
+                f"✅ Test {index + 1}: {meme_data['top_text'][:30]}... -> {meme_image_url}"
+            )
+            return True
 
         except httpx.HTTPStatusError as e:
             error_msg = extract_error_from_html(e.response.text)
@@ -256,9 +276,14 @@ def main():
 
     # Run tests in parallel
     start_time = time.time()
-    passed, total = asyncio.run(
-        run_parallel_tests(test_data, frontend_url, args.num_tests)
-    )
+    try:
+        passed, total = asyncio.run(
+            run_parallel_tests(test_data, frontend_url, args.num_tests)
+        )
+    finally:
+        # Clean up HTTP client
+        asyncio.run(close_async_http_client())
+
     end_time = time.time()
 
     # Summary

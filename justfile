@@ -30,7 +30,7 @@ run *projects="backend frontend":
     for project in {{ projects }}; do
         echo "Starting $project server..."
         just $project/run &
-        sleep 1
+        sleep 0.1
     done
 
     # Wait for all processes

@@ -7,6 +7,23 @@ from django.conf import settings
 from urllib.parse import urlparse, urljoin
 from pathlib import Path
 
+# Global HTTP client with connection pooling
+_http_client = None
+
+def get_http_client():
+    """Get or create a shared HTTP client with connection pooling."""
+    global _http_client
+    if _http_client is None:
+        _http_client = httpx.Client(
+            timeout=30.0,
+            limits=httpx.Limits(
+                max_keepalive_connections=10,
+                max_connections=20,
+                keepalive_expiry=30.0
+            )
+        )
+    return _http_client
+
 
 def is_valid_url(url: str) -> bool:
     """Validate that the URL has a proper format."""
@@ -86,13 +103,12 @@ def meme_generator(request: HttpRequest) -> HttpResponse:
                 # Make request to backend memes API
                 api_url = urljoin(settings.BACKEND_URL, "/api/create/")
 
-                with httpx.Client() as client:
-                    response = client.post(
-                        api_url,
-                        json=api_data,
-                        headers={"Content-Type": "application/json"},
-                        timeout=30.0,
-                    )
+                client = get_http_client()
+                response = client.post(
+                    api_url,
+                    json=api_data,
+                    headers={"Content-Type": "application/json"},
+                )
 
                 if response.status_code == 201:
                     # Success - extract meme ID and redirect to GET with query param
@@ -131,8 +147,8 @@ def meme_generator(request: HttpRequest) -> HttpResponse:
 
                 # Get meme details to populate form
                 api_url = urljoin(settings.BACKEND_URL, f"/api/meme/{meme_id}/")
-                with httpx.Client() as client:
-                    response = client.get(api_url, timeout=30.0)
+                client = get_http_client()
+                response = client.get(api_url)
 
                 if response.status_code == 200:
                     result = response.json()

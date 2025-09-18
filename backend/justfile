@@ -2,13 +2,13 @@
 set dotenv-load := true
 
 # Default recipe
-default:
+_default:
     @just --list
 
 # Run the backend Django server with gunicorn (with OpenTelemetry)
 run:
     uv sync
-    uv run python -m gunicorn --config gunicorn.conf.py wsgi:application
+    uv run python -m gunicorn --config gunicorn.conf.py wsgi:application --bind localhost:8001
 
 # Run Django checks
 check:
@@ -37,11 +37,3 @@ sync:
 # Open Django shell
 shell:
     uv run python manage.py shell
-
-# Collect static files
-collectstatic:
-    uv run python manage.py collectstatic --noinput
-
-# Create superuser
-createsuperuser:
-    uv run python manage.py createsuperuser

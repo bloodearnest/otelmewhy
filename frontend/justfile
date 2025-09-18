@@ -2,13 +2,13 @@
 set dotenv-load := true
 
 # Default recipe
-default:
+_default:
     @just --list
 
 # Run the frontend Django server with gunicorn (with OpenTelemetry)
 run:
     uv sync
-    uv run python -m gunicorn --config gunicorn.conf.py wsgi:application
+    uv run python -m gunicorn --config gunicorn.conf.py wsgi:application --bind localhost:8000
 
 
 # Run system integration tests
@@ -16,52 +16,15 @@ test n="64":
     #!/usr/bin/env bash
     set -euo pipefail
 
-    # Function to cleanup all server processes
-    cleanup_servers() {
-        echo "Cleaning up servers..."
-        # Send SIGINT (Ctrl-C) to the just run process to shut down gracefully
-        if [ -n "${SERVER_PID:-}" ]; then
-            kill -INT $SERVER_PID 2>/dev/null || true
-            # Wait for graceful shutdown
-            sleep 3
-            # If still running, force kill
-            kill $SERVER_PID 2>/dev/null || true
-        fi
-        echo "Server cleanup complete"
-    }
-
     # Check if frontend is running on localhost:8000
     if ! curl -s http://localhost:8000 > /dev/null 2>&1; then
-        echo "Frontend not running, starting servers..."
-        just ../run &
-        SERVER_PID=$!
-
-        # Setup cleanup trap
-        trap cleanup_servers EXIT INT TERM
-
-        # Wait for server to start
-        echo "Waiting for servers to start..."
-        for i in {1..30}; do
-            if curl -s http://localhost:8000 > /dev/null 2>&1; then
-                echo "Servers are up!"
-                break
-            fi
-            sleep 1
-            if [ $i -eq 30 ]; then
-                echo "Timeout waiting for servers to start"
-                cleanup_servers
-                exit 1
-            fi
-        done
-
-        echo "Running system tests..."
-        uv run python test_system.py
-
-        # Cleanup will happen automatically via trap
-    else
-        echo "Servers already running, proceeding with tests..."
-        uv run python test_system.py -n {{ n }}
+        echo "Error: Frontend server not running on localhost:8000"
+        echo "Please start both servers first in another terminal with: just run"
+        exit 1
     fi
+
+    echo "Servers detected, running system tests..."
+    uv run python test_system.py -n {{ n }}
 
 # Run Django checks
 check:
@@ -76,8 +39,8 @@ lint:
     uv run ruff check .
 
 # Install/update dependencies
-sync:
-    uv sync
+sync *args="":
+    uv sync {{ args }}
 
 # Open Django shell
 shell:
@@ -86,9 +49,3 @@ shell:
 # Collect static files
 collectstatic:
     uv run python manage.py collectstatic --noinput
-
-# Show available backend URLs for testing
-backend-urls:
-    @echo "Backend should be running at: http://127.0.0.1:8001"
-    @echo "Backend API endpoint: http://127.0.0.1:8001/api/create/"
-    @echo "Backend health check: http://127.0.0.1:8001/"
