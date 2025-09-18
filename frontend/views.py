@@ -6,22 +6,7 @@ from django.http import HttpRequest, HttpResponse
 from django.conf import settings
 from urllib.parse import urlparse, urljoin
 from pathlib import Path
-
-# Global HTTP client with connection pooling
-_http_client = None
-
-
-def get_http_client():
-    """Get or create a shared HTTP client with connection pooling."""
-    global _http_client
-    if _http_client is None:
-        _http_client = httpx.Client(
-            timeout=30.0,
-            limits=httpx.Limits(
-                max_keepalive_connections=10, max_connections=20, keepalive_expiry=30.0
-            ),
-        )
-    return _http_client
+from client import httpx_client
 
 
 def is_valid_url(url: str) -> bool:
@@ -102,8 +87,7 @@ def meme_generator(request: HttpRequest) -> HttpResponse:
                 # Make request to backend memes API
                 api_url = urljoin(settings.BACKEND_URL, "/api/create/")
 
-                client = get_http_client()
-                response = client.post(
+                response = httpx_client.post(
                     api_url,
                     json=api_data,
                     headers={"Content-Type": "application/json"},
@@ -146,8 +130,7 @@ def meme_generator(request: HttpRequest) -> HttpResponse:
 
                 # Get meme details to populate form
                 api_url = urljoin(settings.BACKEND_URL, f"/api/meme/{meme_id}/")
-                client = get_http_client()
-                response = client.get(api_url)
+                response = httpx_client.get(api_url)
 
                 if response.status_code == 200:
                     result = response.json()

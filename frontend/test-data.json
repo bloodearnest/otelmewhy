@@ -1,6 +1,6 @@
 [
     {
-        "image_url": "https://static.wikia.nocookie.net/thehungergamesrp/images/b/b1/WonkaReal.png/revision/latest/scale-to-width-down/1200?cb=20151126215811",
+        "image_url": "https://static.wikia.nocookie.net/thehungergamesrp/images/b/b1/WonkaReal.png/revision/latest/scale-to-width-down/600?cb=20151126215811",
         "top_text": "Oh you use Prometheus?",
         "bottom_text": "Tell me again how pull is superior"
     },
@@ -10,7 +10,7 @@
         "bottom_text": "So hot right now"
     },
     {
-        "image_url": "https://static0.gamerantimages.com/wordpress/wp-content/uploads/2022/02/Woody--Buzz_Toy-Story.jpg?w=1600&h=900&fit=crop",
+        "image_url": "https://static0.gamerantimages.com/wordpress/wp-content/uploads/2022/02/Woody--Buzz_Toy-Story.jpg?w=600&h=338&fit=crop",
         "top_text": "spans",
         "bottom_text": "spans everywhere"
     },
@@ -38,5 +38,10 @@
         "image_url": "https://pypi-camo.freetls.fastly.net/abad86cae404c71b77358825d2db47dc2f726684/68747470733a2f2f7777772e6d656d652d617273656e616c2e636f6d2f6d656d65732f66623764636663343036346435623735653238316433353435393062313361352e6a7067",
         "top_text": "one does not simply",
         "bottom_text": "observe production"
+    },
+    {
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Pizigani_1367_Chart_10MB.jpg/1500px-Pizigani_1367_Chart_10MB.jpg",
+        "top_text": "When your image is much larger",
+        "bottom_text": "Processing takes significantly longer"
     }
 ]

@@ -35,7 +35,7 @@ async def get_async_http_client():
     global _async_client
     if _async_client is None:
         _async_client = httpx.AsyncClient(
-            timeout=10.0,
+            timeout=30.0,  # Increased to handle artificial delays
             limits=httpx.Limits(
                 max_keepalive_connections=20, max_connections=50, keepalive_expiry=30.0
             ),
@@ -196,7 +196,9 @@ async def test_meme_creation_async(semaphore, base_url, meme_data, index):
                 print(f"   Response text: {e.response.text}")
             return False
         except Exception as e:
-            print(f"❌ Test {index + 1}: {meme_data['top_text'][:30]}... -> ERROR: {e}")
+            print(
+                f"❌ Test {index + 1}: {meme_data['top_text'][:30]}... -> ERROR: {type(e).__name__}: {str(e)}"
+            )
             return False
 
 
