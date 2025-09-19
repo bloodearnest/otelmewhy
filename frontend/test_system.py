@@ -29,6 +29,7 @@ import httpx
 # Global async HTTP client with connection pooling
 _async_client = None
 
+
 async def get_async_http_client():
     """Get or create a shared async HTTP client with connection pooling."""
     global _async_client
@@ -36,19 +37,11 @@ async def get_async_http_client():
         _async_client = httpx.AsyncClient(
             timeout=10.0,
             limits=httpx.Limits(
-                max_keepalive_connections=20,
-                max_connections=50,
-                keepalive_expiry=30.0
-            )
+                max_keepalive_connections=20, max_connections=50, keepalive_expiry=30.0
+            ),
         )
     return _async_client
 
-async def close_async_http_client():
-    """Close the shared async HTTP client."""
-    global _async_client
-    if _async_client is not None:
-        await _async_client.aclose()
-        _async_client = None
 
 # Disable httpx logging
 logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -170,9 +163,7 @@ async def test_meme_creation_async(semaphore, base_url, meme_data, index):
                         if error_msg:
                             print(f"   Error: {error_msg}")
                         else:
-                            print(
-                                f"   Response status: {create_response.status_code}"
-                            )
+                            print(f"   Response status: {create_response.status_code}")
                             print(f"   Response text: {create_response.text}")
                         return False
                 except json.JSONDecodeError:
@@ -256,7 +247,7 @@ def main():
     print("=== Meme Generator System Test ===")
 
     # Configuration - auto-detect Codespaces environment
-    if os.environ.get("CODESPACE_NAME"):
+    if False:  # os.environ.get("CODESPACE_NAME"):
         # In GitHub Codespaces, use the forwarded URL format
         codespace_name = os.environ.get("CODESPACE_NAME")
         frontend_url = f"https://{codespace_name}-8000.app.github.dev"
@@ -276,13 +267,9 @@ def main():
 
     # Run tests in parallel
     start_time = time.time()
-    try:
-        passed, total = asyncio.run(
-            run_parallel_tests(test_data, frontend_url, args.num_tests)
-        )
-    finally:
-        # Clean up HTTP client
-        asyncio.run(close_async_http_client())
+    passed, total = asyncio.run(
+        run_parallel_tests(test_data, frontend_url, args.num_tests)
+    )
 
     end_time = time.time()
 

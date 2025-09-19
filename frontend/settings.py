@@ -16,7 +16,7 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
+ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     "django.contrib.auth",
@@ -32,7 +32,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    # "django.middleware.csrf.CsrfViewMiddleware",  # CSRF disabled for testing
+    # "django.middleware.csrf.CsrfViewMiddleware",  # CSRF disabled for workshop
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -106,7 +106,7 @@ LOGGING = {
     "loggers": {
         "httpx": {
             "handlers": ["console"],
-            "level": "WARNING",
+            "level": "INFO",
         },
     },
 }

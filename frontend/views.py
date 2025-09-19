@@ -10,6 +10,7 @@ from pathlib import Path
 # Global HTTP client with connection pooling
 _http_client = None
 
+
 def get_http_client():
     """Get or create a shared HTTP client with connection pooling."""
     global _http_client
@@ -17,10 +18,8 @@ def get_http_client():
         _http_client = httpx.Client(
             timeout=30.0,
             limits=httpx.Limits(
-                max_keepalive_connections=10,
-                max_connections=20,
-                keepalive_expiry=30.0
-            )
+                max_keepalive_connections=10, max_connections=20, keepalive_expiry=30.0
+            ),
         )
     return _http_client
 

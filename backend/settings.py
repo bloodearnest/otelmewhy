@@ -15,12 +15,7 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() == "true"
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
-
-# Add Codespaces host if running in GitHub Codespaces
-if os.environ.get("CODESPACE_NAME"):
-    codespace_name = os.environ.get("CODESPACE_NAME")
-    ALLOWED_HOSTS.append(f"{codespace_name}-8001.app.github.dev")
+ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",

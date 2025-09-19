@@ -13,7 +13,7 @@ def setup_tracing(server, worker):
         return
 
     # Create a resource with service information
-    resource = Resource.create({ "service.name": "memes.backend"})
+    resource = Resource.create({"service.name": "memes.backend"})
     # this is global to this python process
     provider = TracerProvider(resource=resource)
     trace.set_tracer_provider(provider)

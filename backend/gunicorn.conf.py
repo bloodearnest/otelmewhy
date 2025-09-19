@@ -2,26 +2,28 @@
 from dotenv import load_dotenv
 from tracing import setup_tracing
 import logging
+import signal
+
 
 class ColoredFormatter(logging.Formatter):
     """Custom formatter with colors for different log levels"""
 
     # ANSI color codes
     COLORS = {
-        'DEBUG': '\033[36m',     # Cyan
-        'INFO': '\033[32m',      # Green
-        'WARNING': '\033[33m',   # Yellow
-        'ERROR': '\033[31m',     # Red
-        'CRITICAL': '\033[35m',  # Magenta
-        'RESET': '\033[0m',      # Reset
-        'BACKEND': '\033[34m',   # Blue
+        "DEBUG": "\033[36m",  # Cyan
+        "INFO": "\033[32m",  # Green
+        "WARNING": "\033[33m",  # Yellow
+        "ERROR": "\033[31m",  # Red
+        "CRITICAL": "\033[35m",  # Magenta
+        "RESET": "\033[0m",  # Reset
+        "BACKEND": "\033[34m",  # Blue
     }
 
     def format(self, record):
         # Add color to log level
-        level_color = self.COLORS.get(record.levelname, '')
-        backend_color = self.COLORS['BACKEND']
-        reset = self.COLORS['RESET']
+        level_color = self.COLORS.get(record.levelname, "")
+        backend_color = self.COLORS["BACKEND"]
+        reset = self.COLORS["RESET"]
 
         # Customize the format with colors
         original_format = self._style._fmt
@@ -31,6 +33,7 @@ class ColoredFormatter(logging.Formatter):
         formatted = super().format(record)
         self._style._fmt = original_format  # Reset format
         return formatted
+
 
 # use the default synchronous worker
 workers = 4
@@ -73,7 +76,12 @@ logconfig_dict = {
 }
 
 # Custom access log format without timestamp (since it's in the main log format)
-access_log_format = '%(m)s %(U)s %(s)s %(B)s'
+access_log_format = "%(m)s %(U)s %(s)s %(B)s"
+
+
+def when_ready(server):
+    # Ignore WINCH signal
+    signal.signal(signal.SIGWINCH, signal.SIG_IGN)
 
 
 def post_fork(server, worker):
