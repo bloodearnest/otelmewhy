@@ -8,7 +8,7 @@ from urllib.parse import urlparse, urljoin
 from pathlib import Path
 
 
-def get_simple_client():
+def get_client():
     return httpx.Client(timeout=15.0)
 
 
@@ -90,7 +90,7 @@ def meme_generator(request: HttpRequest) -> HttpResponse:
                 # Make request to backend memes API
                 api_url = urljoin(settings.BACKEND_URL, "/api/create/")
 
-                with get_simple_client() as client:
+                with get_client() as client:
                     response = client.post(
                         api_url,
                         json=api_data,
@@ -134,7 +134,7 @@ def meme_generator(request: HttpRequest) -> HttpResponse:
 
                 # Get meme details to populate form
                 api_url = urljoin(settings.BACKEND_URL, f"/api/meme/{meme_id}/")
-                with get_simple_client() as client:
+                with get_client() as client:
                     response = client.get(api_url)
 
                 if response.status_code == 200:

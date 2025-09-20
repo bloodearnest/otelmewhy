@@ -9,7 +9,7 @@ def setup_tracing(server, worker):
     """Set up otel provider and exporters."""
 
     # do not export backend telemetry initially for pedagological purposes
-    if "DISABLE_BACKEND_TELEMETRY" in os.environ:
+    if "ENABLE_BACKEND_TELEMETRY" not in os.environ:
         return
 
     # Create a resource with service information
