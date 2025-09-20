@@ -24,7 +24,7 @@ def setup_tracing(server, worker):
         console_exporter = export.ConsoleSpanExporter()
         provider.add_span_processor(export.SimpleSpanProcessor(console_exporter))
         server.log.info(f"Set up console exporter for worker {worker.pid}")
-    elif traces_exporter == "otlp":
+    elif traces_exporter == "otlp" and "OTEL_EXPORTER_OTLP_HEADERS" in os.environ:
         otlp_exporter = OTLPSpanExporter()
         provider.add_span_processor(export.BatchSpanProcessor(otlp_exporter))
         server.log.info(f"Set up OTLP exporter for worker {worker.pid}")

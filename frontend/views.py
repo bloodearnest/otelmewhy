@@ -6,7 +6,10 @@ from django.http import HttpRequest, HttpResponse
 from django.conf import settings
 from urllib.parse import urlparse, urljoin
 from pathlib import Path
-from client import httpx_client
+
+
+def get_simple_client():
+    return httpx.Client(timeout=15.0)
 
 
 def is_valid_url(url: str) -> bool:
@@ -87,11 +90,12 @@ def meme_generator(request: HttpRequest) -> HttpResponse:
                 # Make request to backend memes API
                 api_url = urljoin(settings.BACKEND_URL, "/api/create/")
 
-                response = httpx_client.post(
-                    api_url,
-                    json=api_data,
-                    headers={"Content-Type": "application/json"},
-                )
+                with get_simple_client() as client:
+                    response = client.post(
+                        api_url,
+                        json=api_data,
+                        headers={"Content-Type": "application/json"},
+                    )
 
                 if response.status_code == 201:
                     # Success - extract meme ID and redirect to GET with query param
@@ -130,7 +134,8 @@ def meme_generator(request: HttpRequest) -> HttpResponse:
 
                 # Get meme details to populate form
                 api_url = urljoin(settings.BACKEND_URL, f"/api/meme/{meme_id}/")
-                response = httpx_client.get(api_url)
+                with get_simple_client() as client:
+                    response = client.get(api_url)
 
                 if response.status_code == 200:
                     result = response.json()
